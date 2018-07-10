@@ -18,12 +18,15 @@ function parseList($ul, $) {
         let article = {};
         let $li = $(this);
         let $p = $li.children('p');
-        article.title = ($p.text() ||  dom.textNode($li.get(0))).trim();
+        article.title = ($p.text() || dom.textNode($li.get(0))).trim();
 
         let $a = $li.find(SELECTOR_LINK);
         if ($a.length > 0) {
             article.title = $a.first().text();
-            article.ref = $a.attr('href').replace(/\\/g, '/').replace(/^\/+/, '');
+            article.ref = $a
+                .attr('href')
+                .replace(/\\/g, '/')
+                .replace(/^\/+/, '');
         }
 
         let $sub = findList($li);
@@ -42,7 +45,7 @@ function findParts($parent, $) {
     let parts = [];
     let previousPart = null;
 
-    partsAndLists.each(function (i, el) {
+    partsAndLists.each(function(i, el) {
         if (isPartNode(el)) {
             if (previousPart !== null) {
                 parts.push(previousPart);
@@ -51,8 +54,7 @@ function findParts($parent, $) {
                 title: getPartTitle(el, $),
                 list: null
             };
-
-        } else { 
+        } else {
             if (previousPart !== null) {
                 previousPart.list = el;
             } else {
@@ -77,13 +79,13 @@ function isPartNode(el) {
     return SELECTOR_PART.indexOf(el.name) !== -1;
 }
 
-
 function getPartTitle(el, $) {
-    return $(el).text().trim();
+    return $(el)
+        .text()
+        .trim();
 }
 
 function parseMenu($) {
-    
     let $root = dom.cleanup(dom.root($), $);
 
     let parts = findParts($root, $);
@@ -101,23 +103,22 @@ function parseMenu($) {
     return parsedParts;
 }
 
-function parseTitleAndLogo($){
-
+function parseTitleAndLogo($) {
     let $title = $('h1:first-child');
     let $logo = $('p>img:first-child').first();
     let data = {
         title: $title.text().trim(),
         logo: $logo.attr('src')
-    }
+    };
     $title.remove();
     $logo.remove();
     return data;
 }
 
-function parseNav(html){
+function parseNav(html) {
     let $ = dom.parse(html);
     let data = parseTitleAndLogo($);
-    data.menus = parseMenu($)
+    data.menus = parseMenu($);
     return data;
 }
 
