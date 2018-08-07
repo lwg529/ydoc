@@ -37,6 +37,7 @@ addHook([
 addTplHook(['header', 'mask']);
 
 function bindHook(name, listener) {
+    // console.log('----name',name, '----lsitener', listener);
     if (!name) throw new Error(`Hookname ${name} is undefined.`);
     if (name in hooks === false) {
         throw new Error(`It is't exist hookname ${name}.`);
@@ -146,10 +147,13 @@ function bindHooks(pluginModule, options) {
 }
 
 exports.loadPlugins = function loadPlugins() {
+
     const ydocConfig = ydoc.config;
     let modules = path.resolve(process.cwd(), 'node_modules');
+    // 存在插件
     if (Array.isArray(ydocConfig.plugins) && ydocConfig.plugins.length > 0) {
         ydocConfig.plugins.forEach(item => {
+            // 去掉默认的插件
             if (item[0] === '-') {
                 let name = item.substr(1);
                 DEFAULT_PLUGINS = DEFAULT_PLUGINS.filter(item => {
@@ -160,6 +164,7 @@ exports.loadPlugins = function loadPlugins() {
         ydocConfig.plugins = ydocConfig.plugins.filter(item => item[0] !== '-');
     }
 
+    // 合并插件到plugins
     let plugins = [].concat(DEFAULT_PLUGINS);
     if (ydocConfig.plugins && Array.isArray(ydocConfig.plugins)) {
         plugins = plugins.concat(ydocConfig.plugins);
@@ -179,6 +184,7 @@ exports.loadPlugins = function loadPlugins() {
                 pluginName = pluginName.name;
                 pluginModuleDir = process.cwd();
             } else {
+                // 从nodemodules中获取插件
                 try {
                     pluginModuleDir = path.resolve(
                         modules,
@@ -198,7 +204,7 @@ exports.loadPlugins = function loadPlugins() {
                 ydocConfig.pluginsConfig
                     ? ydocConfig.pluginsConfig[pluginName]
                     : null;
-
+            // console.log('----options', options, '---pluginModule', pluginModule);
             bindHooks(pluginModule, options);
             if (pluginModule.assets) {
                 handleAssets(pluginModule.assets, pluginModuleDir, pluginName);
